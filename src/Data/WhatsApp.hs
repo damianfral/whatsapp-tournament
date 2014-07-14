@@ -2,12 +2,7 @@
 module Data.WhatsApp where
 
 import Control.Applicative
-import Control.Arrow
 import Control.Monad
-import Data.Function
-import Data.List
-import Data.Maybe
-import Data.Monoid
 import Text.Parsec hiding ((<|>), many)
 
 type Parser = Parsec String ()
@@ -24,16 +19,16 @@ whatsAppChatParser = many whatsAppMessageParser
 
 whatsAppMessageParser :: Parser WhatsAppMessage
 whatsAppMessageParser = do
-	dat <- whatsAppDateParser
-	from <- whatsAppNameParser
-	message <- manyTill anyChar newline
-	return $ WhatsAppMessage dat from message
+	dat      <- whatsAppDateParser
+	from'    <- whatsAppNameParser
+	message' <- manyTill anyChar $ try (void newline *> (lookAhead (void whatsAppDateParser) <|> eof))
+	return $ WhatsAppMessage dat from' message'
 
 whatsAppNameParser :: Parser String
 whatsAppNameParser = manyTill anyChar $ string ": "
 
 numberParser :: Parser Int
-numberParser = many1 digit >>= \d ->return (read d :: Int)
+numberParser = many1 digit >>= \d -> return (read d :: Int)
 
 data Date = Date {year :: Int, month :: Int, day :: Int, hour :: Int, minute :: Int}
 	deriving (Eq, Ord, Show)
@@ -62,14 +57,19 @@ monthParser =      (string "ene." *> pure 1)
 whatsAppDateParser :: Parser Date
 whatsAppDateParser = try whatsAppDateParser1 <|> try whatsAppDateParser2
 
+clockParser' :: Parser (Int, Int)
+clockParser' = do
+	string ", "
+	(ho, mi) <- clockParser
+	string " - "
+	return (ho,mi)
+
 whatsAppDateParser1 :: Parser Date
 whatsAppDateParser1 = do
 	d <- numberParser
 	string " de "
 	m <- monthParser
-	string ", "
-	(ho, mi) <- clockParser
-	string " - "
+	(ho, mi) <- clockParser'
 	return $ Date 2014 m d ho mi
 
 whatsAppDateParser2 :: Parser Date
@@ -79,7 +79,5 @@ whatsAppDateParser2 = do
 	m <- numberParser
 	string "/"
 	y <- numberParser
-	string ", "
-	(ho, mi) <- clockParser
-	string " - "
+	(ho, mi) <- clockParser'
 	return $ Date y m d ho mi
