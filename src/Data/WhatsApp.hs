@@ -6,7 +6,7 @@ import Control.Monad
 import Text.Parsec hiding ((<|>), many)
 
 type Parser = Parsec String ()
-data WhatsAppMessage = WhatsAppMessage {date :: Date, from :: String, message :: String} deriving (Eq, Ord, Show)
+data WhatsAppMessage = WhatsAppMessage {_date :: Date, _from :: String, _message :: String} deriving (Eq, Ord, Show)
 
 parseWhatsAppChat :: String -> Either ParseError [WhatsAppMessage]
 parseWhatsAppChat = runParser whatsAppChatParser () ""
@@ -30,7 +30,7 @@ whatsAppNameParser = manyTill anyChar $ string ": "
 numberParser :: Parser Int
 numberParser = many1 digit >>= \d -> return (read d :: Int)
 
-data Date = Date {year :: Int, month :: Int, day :: Int, hour :: Int, minute :: Int}
+data Date = Date {_year :: Int, _month :: Int, _day :: Int, _hour :: Int, _minute :: Int}
 	deriving (Eq, Ord, Show)
 
 clockParser :: Parser (Int, Int)
@@ -70,7 +70,7 @@ whatsAppDateParser1 = do
 	string " de "
 	m <- monthParser
 	(ho, mi) <- clockParser'
-	return $ Date 2014 m d ho mi
+	return $ Date 2015 m d ho mi
 
 whatsAppDateParser2 :: Parser Date
 whatsAppDateParser2 = do

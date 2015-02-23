@@ -2,8 +2,8 @@
 -- For further documentation, see http://haskell.org/cabal/users-guide/
 
 name:                   whatsapp-tournament
-version:                0.1.0.0
-synopsis:               
+version:                0.2.0.0
+synopsis:
 -- description:
 homepage:               http://github.com/&quot;damianfral&quot;/whatsapp-tournament
 license:                MIT
@@ -25,7 +25,7 @@ executable whatsapp-tournament
   main-is:              Main.hs
   -- other-modules:
   -- other-extensions:
-  build-depends:        base >= 4.6, parsec, tabular
+  build-depends:        base >= 4.6, parsec, tabular, time
   hs-source-dirs:       src
   ghc-options:          -Wall
   default-language:     Haskell2010
